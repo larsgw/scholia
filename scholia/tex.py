@@ -260,9 +260,10 @@ def extract_qs_from_aux_string(string):
     matches = re.findall(r'^\\citation{(.+?)}', string,
                          flags=re.MULTILINE | re.UNICODE)
     qs = []
+    wd_re = re.compile(r'^Q\d+$')
     for submatches in matches:
         for q in submatches.split(','):
-            if re.match(r'^Q\d+$', q):
+            if wd_re.match(q):
                 qs.append(q)
 
     return qs
