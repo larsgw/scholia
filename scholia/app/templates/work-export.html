@@ -16,9 +16,18 @@
       ("data", "CSL-JSON"),
       ("refworks", "RefWorks"),
       ("ris", "RIS"),
+      ("wikipediaTemplate", "Wikipedia template"),
     ] %}
       <option value="{{ id }}" style="text-align: left;">{{ label }}</option>
     {% endfor %}
+  </select>
+</p>
+
+<p hidden>
+  <label for="export-template-format">Template format</label>
+  <select class="btn btn-outline-secondary" id="export-template-format">
+    <option value="vertical" style="text-align: left;">Vertical</option>
+    <option value="horizontal" style="text-align: left;">Horizontal</option>
   </select>
 </p>
 
@@ -76,22 +85,38 @@ $(function () {
     return item
   }
 
+  function updateOutputOptionControls () {
+    var format = $('#export-format').val()
+    if (format === 'wikipediaTemplate') {
+      $('#export-template-format').parent().removeAttr('hidden')
+    } else {
+      $('#export-template-format').parent().attr('hidden', '')
+    }
+  }
+
   function generateOutput () {
     if (!data) {
       return
     }
     var format = $('#export-format').val()
     var version = $('#export-version').val()
+    var templateFormat = $('#export-template-format').val()
 
     var data_ = data
     if (version) {
       data_ = new Cite(applyVersion(data_.data[0], data_.data[0].custom.versions[version - 1]))
     }
-    $('#output').text(data_.format(format))
+
+    var options
+    if (format === 'wikipediaTemplate') {
+      options = { format: templateFormat }
+    }
+
+    $('#output').text(data_.format(format, options))
   }
 
-  $('#export-format').on('change', generateOutput)
-  $('#export-version').on('change', generateOutput)
+  $('#export-format, #export-version, #export-template-format').on('change', generateOutput)
+  $('#export-format').on('change', updateOutputOptionControls)
 })
 </script>
 
